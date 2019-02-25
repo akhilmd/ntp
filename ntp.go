@@ -233,6 +233,10 @@ type Response struct {
 	// Poll is the maximum interval between successive NTP polling messages.
 	// It is not relevant for simple NTP clients like this one.
 	Poll time.Duration
+
+	// Time (local system time) at which the client received a response
+	// from the NTP Server. This is named `dst` in the standard.
+	DestTime time.Time
 }
 
 // Validate checks if the response is valid for the purposes of time
@@ -463,6 +467,7 @@ func parseTime(m *msg, recvTime ntpTime) *Response {
 		Leap:           m.getLeap(),
 		MinError:       minError(m.OriginTime, m.ReceiveTime, m.TransmitTime, recvTime),
 		Poll:           toInterval(m.Poll),
+		DestTime:       recvTime.Time(),
 	}
 
 	// Calculate values depending on other calculated values
